@@ -40,4 +40,4 @@
     mode: 0644
     owner: promtail
     group: promtail
-  notify: restart promtail
+  notify: Restart promtail
