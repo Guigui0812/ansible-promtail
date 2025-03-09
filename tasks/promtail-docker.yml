@@ -1,0 +1,66 @@
+---
+# tasks file for promtail docker
+
+- name: Create loki and promtail groups
+  group:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - promtail
+    - logs-readers
+
+- name: Create promtail user
+  user:
+    name: promtail
+    state: present
+    groups: 
+      - promtail
+      - logs-readers
+
+- name: Get promtail user
+  command: id -u promtail
+  register: promtail_user
+  failed_when: promtail_user.rc != 0
+  changed_when: false
+
+- name: Create variables for promtail user
+  set_fact:
+    promtail_user: "{{ promtail_user.stdout }}"
+
+- name: Get logs-readers group
+  shell: getent group logs-readers | cut -d ":" -f 3
+  register: logs_readers_group
+  failed_when: logs_readers_group.rc != 0
+  changed_when: false
+
+- name: Create variable for logs-readers group
+  set_fact:
+    logs_readers_group_id: "{{ logs_readers_group.stdout }}"
+
+- name: Create promtail configuration directories
+  file:
+    path: "/opt/promtail"
+    state: directory
+    mode: 0775
+    owner: promtail
+    group: promtail
+
+- name:  Import promtail configuration template
+  template:
+    src: templates/promtail-config.yaml.j2
+    dest: /opt/promtail/promtail-config.yaml
+    mode: 0644
+    owner: promtail
+    group: promtail
+
+- name: Import docker compose template
+  template:
+    src: templates/docker-compose.yaml.j2
+    dest: /opt/promtail/docker-compose.yaml
+    mode: 0644
+    owner: "{{ ansible_user }}"
+
+- name: Start promtail service
+  community.docker.docker_compose_v2:
+    project_src: "/opt/promtail/"
+    state: present

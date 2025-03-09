@@ -1,0 +1,7 @@
+---
+# handlers file for promtail
+- name: Restart promtail
+  service:
+    name: promtail
+    state: restarted
+    enabled: yes

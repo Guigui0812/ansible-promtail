@@ -1,0 +1,43 @@
+# 
+- name: Add Grafana GPG key
+  get_url:
+    url: https://apt.grafana.com/gpg.key
+    dest: /etc/apt/keyrings/grafana.asc
+    mode: 0644      
+  when: ansible_os_family == "Debian"
+
+- name: Add Grafana repository
+  ansible.builtin.apt_repository:
+    repo: deb [signed-by=/etc/apt/keyrings/grafana.asc] https://apt.grafana.com stable main
+    state: present
+    filename: grafana
+  when: ansible_os_family == "Debian"
+
+- name: Installer promtail package
+  package:
+    name: promtail
+    state: present
+
+- name: Add promtail user to docker group if exists
+  user:
+    name: promtail
+    groups: docker
+    append: yes
+  when: docker_installed is true
+
+- name: Ensure promtail directory exists
+  file:
+    path: /etc/promtail
+    state: directory
+    owner: promtail
+    group: promtail
+    mode: 0755
+
+- name:  Import promtail configuration template
+  template:
+    src: templates/promtail-config.yaml.j2
+    dest: /etc/promtail/config.yml
+    mode: 0644
+    owner: promtail
+    group: promtail
+  notify: restart promtail

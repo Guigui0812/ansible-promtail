@@ -1,0 +1,39 @@
+---
+# tasks file for promtail
+
+- name: Create promtail group and ensure log reader group is present
+  group:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - promtail
+    - "{{ promtail_log_reader_group }}"
+
+- name: Create promtail user
+  user:
+    name: promtail
+    state: present
+    groups: 
+      - promtail
+      - "{{ promtail_log_reader_group }}"
+
+- name: Populate service facts
+  ansible.builtin.service_facts:
+
+- name: Check if docker is installed
+  set_fact:
+    docker_installed: true
+  when: "'docker' in ansible_facts.services"
+
+- name: Message if docker is not installed
+  debug:
+    msg: "Docker is installed"
+  when: docker_installed is defined
+
+- name: Include promtail docker tasks
+  include_tasks: promtail-docker.yml
+  when: ansible_architecture in 'arm7' and docker_installed is defined
+
+- name: Include promtail classic tasks
+  include_tasks: promtail-local.yml
+  when: ansible_architecture not in 'arm7'

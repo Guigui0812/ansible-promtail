@@ -1,0 +1,14 @@
+services:
+  promtail:
+    user: {{ promtail_user }}:{{ promtail_user }}
+    group_add : 
+      - {{ logs_readers_group_id }}
+    image: grafana/promtail:latest
+    volumes:
+      - /var/log:/var/log
+      - ./promtail-config.yaml:/etc/promtail/promtail-config.yaml
+    command: -config.file=/etc/promtail/promtail-config.yaml
+{% if loki_docker_compose_network is defined %}
+    networks:
+      - {{ loki_docker_compose_network }}
+{% endif %}

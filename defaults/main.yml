@@ -1,0 +1,5 @@
+---
+# defaults file for promtail
+promtail_config_path: files/promtail-config.yaml
+promtail_port: 9080
+promtail_log_reader_group: adm
