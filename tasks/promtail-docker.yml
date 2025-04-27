@@ -32,3 +32,12 @@
   community.docker.docker_compose_v2:
     project_src: "/opt/promtail/"
     state: present
+
+- name:  Import promtail configuration template
+  template:
+    src: templates/promtail-config.yaml.j2
+    dest: /opt/promtail/config.yml
+    mode: 0644
+    owner: promtail
+    group: promtail
+  notify: Restart promtail container

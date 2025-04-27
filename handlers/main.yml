@@ -5,3 +5,9 @@
     name: promtail
     state: restarted
     enabled: yes
+
+- name: Restart promtail container
+  community.docker.docker_compose_v2:
+    project_src: "/opt/promtail/"
+    state: restarted
+  when: ansible_architecture in 'armv7l'
