@@ -44,7 +44,7 @@ promtail_loki_url: http://<loki_server>:3100
 ```
 
 Playbook example : 
-```
+```yaml
 - hosts: servers
   roles:
     - promtail

@@ -1,7 +1,7 @@
 ---
 # tasks file for promtail
 
-- name: Create promtail group and ensure log reader group is present
+- name: Create promtail group and ensure adm group exists
   group:
     name: "{{ item }}"
     state: present
@@ -29,11 +29,29 @@
   debug:
     msg: "Docker is installed"
   when: docker_installed is defined
+  failed_when: docker_installed is not defined and ansible_architecture in 'armv7l'
+
+- name: Ensure promtail directory exists
+  file:
+    path: /opt/promtail
+    state: directory
+    owner: promtail
+    group: promtail
+    mode: 0755
+
+- name:  Import promtail configuration template
+  template:
+    src: templates/promtail-config.yaml.j2
+    dest: /opt/promtail/config.yml
+    mode: 0644
+    owner: promtail
+    group: promtail
+  notify: Restart promtail
 
 - name: Include promtail docker tasks
   include_tasks: promtail-docker.yml
-  when: ansible_architecture in 'arm7' and docker_installed is defined
+  when: ansible_architecture in 'armv7l' and docker_installed is defined
 
 - name: Include promtail classic tasks
   include_tasks: promtail-local.yml
-  when: ansible_architecture not in 'arm7'
+  when: ansible_architecture not in 'armv7l'

@@ -24,20 +24,3 @@
     groups: docker
     append: yes
   when: docker_installed is true
-
-- name: Ensure promtail directory exists
-  file:
-    path: /etc/promtail
-    state: directory
-    owner: promtail
-    group: promtail
-    mode: 0755
-
-- name:  Import promtail configuration template
-  template:
-    src: templates/promtail-config.yaml.j2
-    dest: /etc/promtail/config.yml
-    mode: 0644
-    owner: promtail
-    group: promtail
-  notify: Restart promtail

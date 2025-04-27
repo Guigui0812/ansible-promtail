@@ -1,22 +1,6 @@
 ---
 # tasks file for promtail docker
 
-- name: Create loki and promtail groups
-  group:
-    name: "{{ item }}"
-    state: present
-  loop:
-    - promtail
-    - logs-readers
-
-- name: Create promtail user
-  user:
-    name: promtail
-    state: present
-    groups: 
-      - promtail
-      - logs-readers
-
 - name: Get promtail user
   command: id -u promtail
   register: promtail_user
@@ -36,22 +20,6 @@
 - name: Create variable for logs-readers group
   set_fact:
     logs_readers_group_id: "{{ logs_readers_group.stdout }}"
-
-- name: Create promtail configuration directories
-  file:
-    path: "/opt/promtail"
-    state: directory
-    mode: 0775
-    owner: promtail
-    group: promtail
-
-- name:  Import promtail configuration template
-  template:
-    src: templates/promtail-config.yaml.j2
-    dest: /opt/promtail/promtail-config.yaml
-    mode: 0644
-    owner: promtail
-    group: promtail
 
 - name: Import docker compose template
   template:
