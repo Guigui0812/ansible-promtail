@@ -8,8 +8,8 @@ services:
       - /var/log:/var/log
       - ./promtail-config.yaml:/etc/promtail/promtail-config.yaml
     command: --config.file=/etc/promtail/promtail-config.yaml
+    restart: always
 {% if loki_docker_compose_network is defined %}
     networks:
       - {{ loki_docker_compose_network }}
-    restart: always
 {% endif %}
