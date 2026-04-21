@@ -18,17 +18,10 @@
     name: promtail
     state: present
 
-- name: Add promtail user to docker group if exists
-  user:
-    name: promtail
-    groups: docker
-    append: yes
-  when: docker_installed is true
-
 - name:  Import promtail configuration template
   template:
     src: templates/promtail-config.yaml.j2
-    dest: /opt/promtail/config.yml
+    dest: /etc/promtail/promtail-config.yml
     mode: 0644
     owner: promtail
     group: promtail

@@ -25,6 +25,7 @@ Role Variables
 
 | Variable | Description | Default |
 |----------|-------------|---------|
+| `promtail_flavor` | Promtail flavor to install, either `local` or `docker` | `local` |
 | `promtail_loki_url` | URL of the Loki server | None |
 | `promtail_port` | Port of the Promtail server | `3101` |
 | `promtail_log_reader_group` | Group to add the promtail user to read logs | `adm` |

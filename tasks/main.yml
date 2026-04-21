@@ -29,7 +29,7 @@
   debug:
     msg: "Docker is installed"
   when: docker_installed is defined
-  failed_when: docker_installed is not defined and ansible_architecture in 'armv7l'
+  failed_when: docker_installed is not defined and promtail_flavor == "docker"
 
 - name: Ensure promtail directory exists
   file:
@@ -41,8 +41,8 @@
 
 - name: Include promtail docker tasks
   include_tasks: promtail-docker.yml
-  when: ansible_architecture in 'armv7l' and docker_installed is defined
+  when: ansible_architecture in 'armv7l' or promtail_flavor == "docker"
 
 - name: Include promtail classic tasks
   include_tasks: promtail-local.yml
-  when: ansible_architecture not in 'armv7l'
+  when: ansible_architecture not in 'armv7l' and promtail_flavor == "local"
